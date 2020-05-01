@@ -1,0 +1,112 @@
+<head>
+    <title>Denis Duchev Portfolio</title>
+    <link rel="shortcut icon" type="image/png" href="Photos/Elements/Icon.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="jquery-3.4.1.min.js"></script>
+</head>
+
+<body>
+    <div class='wrapper'>
+        <div class='smooth'>
+            <header>
+                <ul id="menu">
+                    <li> <a class="header" id="home" href="index.html"> <em><strong> HOME </a> </li>
+                        <li> <a class = "header" id = "stuff" href="https://open.spotify.com/user/mr.detox"> <em><strong> SPOTIFY </a> </li>
+                        <li> <a class = "header" id = "story" href="https://youtu.be/e_RAzaD85hQ"> <em><strong> FISSION </a> </li>
+        </ul>	
+    </header>
+                <div id="lines" > </div> <!--glowing lines around clouds-->
+                
+                <div  style="height: 1200px;" class="block">
+<p>These videos are part of my gradual improvement in after effects and premier pro. Although held back by my inefficient computer I still enjoy creating those videos most of which are in some way related to my friend group. Usually I get an idea of something because of a conversation that we have and I begin thinking how I can make it into a video. Later through the year I found that I really enjoyed turning static wallpapers into animated wallpapers as they usually are shorter and take less time to render.</p>
+
+
+                <video width="206px;" src="Photos/CAS Videos/Astronner 6.mp4" ></video>
+                <video width="206px;" src="Photos/CAS Videos/Cyber Truck 5.mp4" ></video>
+                <video width="206px;" src="Photos/CAS Videos/English Sale Pitch.mp4" ></video>
+                <video width="206px;" src="Photos/CAS Videos/Universal logo 8.mp4" ></video>            
+                <video width="206px;" src="Photos/CAS Videos/Fire mouth (1).mp4" ></video>
+                <video width="206px;" src="Photos/CAS Videos/JoJo Meme Video.mp4" ></video>
+
+
+                <video width="445px;" src="Photos/CAS Videos/Toy Tank + Sound.mp4" ></video>
+                <video width="445px;" src="Photos/CAS Videos/Black Hole 2.mp4" ></video>
+                <video width="445px;" src="Photos/CAS Videos/Fica with Wings v3.mp4" ></video>
+                <video width="445px;" src="Photos/CAS Videos/OOF Bomb + Sound.mp4" ></video>
+                <video width="445px;" src="Photos/CAS Videos/Power Fica v2.mp4" ></video>
+                <video width="445px;" src="Photos/CAS Videos/Scary movie Final v1.mp4" ></video>
+
+                </div>
+                <img style="width: 24.5%;position:absolute;
+                left: 50.4%;top: -12px;" src="Photos/Elements/clouds2.gif">
+                <img style="width: 24.5%;position:absolute;
+                right: 10px;top: -12px;" src="Photos/Elements/clouds2.gif">
+
+                <img style="width: 5.01%;position: absolute;top: 0px; left: 75%;
+                transform: translate(-50%, 0%);" src="Photos/Me/School Photo of Me.jpg">
+
+                <img style="position: fixed;height: 100px;width: 97.3%;" src="Photos/Elements/long-clouds2.gif">
+     <footer>
+                <div class = "block" style="height: 100px;background-color: rgba(0, 255, 64, 0.5); "></div>
+                <h5>made by Denis Duchev</h5>
+
+    </footer>
+</div>
+</div>
+</body>
+
+<script>
+    var lastPosition = -100;
+
+$(document).ready(function() {
+    $('.wrapper').height($('.smooth').height());
+
+    $(window).resize(function() {
+        $('.wrapper').height($('.smooth').height());
+    });
+});
+
+var scroll = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+
+    function(callback) {
+        window.setTimeout(callback, 1000 / 60)
+    };
+
+function loop() {
+
+    if (lastPosition == window.pageYOffset) {
+        scroll(loop);
+        return false;
+    } else lastPosition = window.pageYOffset;
+
+    var transform = 'translate3d(0px, -' + lastPosition + 'px, 0px)';
+    var smoothScoll = $(".smooth")[0];
+
+    smoothScoll.style.webkitTransform = transform;
+    smoothScoll.style.mozTransform = transform;
+    smoothScoll.style.transform = transform;
+    scroll(loop)
+}
+loop();
+
+
+const videos = document.querySelectorAll("video");
+
+videos.forEach(video  => {
+    video.addEventListener("mouseover", function(){
+        this.play();
+    })
+    video.addEventListener("mouseout", function(){
+        this.pause();
+    })
+    video.addEventListener("click", function(){
+        this.webkitRequestFullscreen();
+    })
+})
+
+</script> 
