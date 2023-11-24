@@ -1,0 +1,126 @@
+<head>
+    <title>Denis Duchev Portfolio</title>
+    <link rel="shortcut icon" type="image/png" href="Photos/Elements/Icon.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class='wrapper'>
+        <div class='smooth'>
+            <header>
+                <ul id="menu">
+                    <li> <a class="header" id="home" href="index.html"> <em><strong> HOME </a> </li>
+            <li> <a class = "header" id = "stuff" href="https://open.spotify.com/user/mr.detox"> <em><strong> SPOTIFY </a> </li>
+            <li> <a class = "header" id = "story" href="https://youtu.be/e_RAzaD85hQ"> <em><strong> FISSION </a> </li>
+        </ul>	
+    </header>
+                <div id="lines" > </div> <!--glowing lines around clouds-->
+
+                <div class = "block" style="height: 730px;background-color: rgba(0, 0, 0, 0.3);">
+                <p>Over all this year I plan on working on the things I like. Mostly I want to continue my activities as this brings me joy and 
+                 it is a great way for me to relax.
+                 We will have to see how the application process affects my free time.                   
+                 Application process update: Although tiresome, I was still able to manage my time and still did the things that I enjoyed. 
+                 Notes: I am not used to recording what I am doing which usually means I don't have picture evidence of me doing some tasks, for 
+                 example I walk my dog everyday for roughly 2 hours, but I have never taken a photo of me doing so usually because I don't remember 
+                 or am listening to something.</p>
+
+                    <img class="me" src="Photos/Me/fitness.jpg">
+
+                    <img class="me" src="Photos/Me/unnamed (1).jpg">
+
+                    <img class="me" src="Photos/Me/unnamed (3).jpg">
+
+                    <img class="me" src="Photos/Me/unnamed.jpg">
+
+
+
+
+
+                </div>
+
+
+                <div class = "block" style="height: 630px;background-color: rgba(0, 0, 0, 0.7);">
+                    
+                    <h2 class = "video-thumbnail-text-0">VIDEOS</h2>
+                    <h2 class = "video-thumbnail-text-1">VIDEOS</h2>
+                    
+                        <a href="videos.html">
+                            <video id = "video-thumbnail"
+                            autoplay loop muted playsinline src="Photos/Video/Car3.mp4" ></video>                    
+                        </a>
+
+                </div>
+
+                <div class = "block" style="height: 630px;background-color: rgba(0, 0, 0, 0.8);">
+                
+                    <h2 class = "image-thumbnail-text-0">IMAGES</h2>
+                    <h2 class = "image-thumbnail-text-1">IMAGES</h2>
+
+                        <a href="images.html">
+                            <video id = "image-thumbnail"
+                            autoplay loop muted playsinline src="Photos/Video/Green-Hole.mp4" ></video>
+                        </a>                
+
+                </div>
+
+
+                <img style="width: 24.5%;position:absolute;
+                left: 50.4%;top: -12px;" src="Photos/Elements/clouds2.gif">
+                <img style="width: 24.5%;position:absolute;
+                right: 10px;top: -12px;" src="Photos/Elements/clouds2.gif">
+
+                <img style="width: 5.01%;position: absolute;top: 0px; left: 75%;
+                transform: translate(-50%, 0%);" src="Photos/Me/Me.gif">
+
+                <img style="position: fixed;height: 100px;width: 97.3%;" src="Photos/Elements/long-clouds2.gif">
+     <footer>
+                <div class = "block" style="height: 100px;background-color: rgba(0, 255, 64, 0.5); "></div>
+                <h5>made by Denis Duchev</h5>
+
+    </footer>
+</div>
+</div>
+</body>
+
+<script>
+    var lastPosition = -100;
+
+$(document).ready(function() {
+    $('.wrapper').height($('.smooth').height());
+
+    $(window).resize(function() {
+        $('.wrapper').height($('.smooth').height());
+    });
+});
+
+
+var scroll = window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+
+    function(callback) {
+        window.setTimeout(callback, 1000 / 60)
+    };
+
+function loop() {
+
+    if (lastPosition == window.pageYOffset) {
+        scroll(loop);
+        return false;
+    } else lastPosition = window.pageYOffset;
+
+    var transform = 'translate3d(0px, -' + lastPosition + 'px, 0px)';
+    var smoothScoll = $(".smooth")[0];
+
+    smoothScoll.style.webkitTransform = transform;
+    smoothScoll.style.mozTransform = transform;
+    smoothScoll.style.transform = transform;
+    scroll(loop)
+}
+loop();
+
+</script>
