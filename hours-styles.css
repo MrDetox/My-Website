@@ -1,0 +1,150 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding-top: 50px;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.input-section {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-section input {
+    width: calc(100% - 22px); /* Adjust width to fit container with padding */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.blue-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    margin: 5px 0;
+    position: relative;
+}
+
+.blue-button:hover {
+    background-color: #0056b3;
+}
+
+#wageContainer {
+    display: flex;
+    align-items: center;
+    width: 40px; /* Set initial width */
+}
+
+#currencySymbol {
+    margin-right: 5px;
+}
+
+#wageValue[contenteditable="true"] {
+    outline: none;
+    margin-right: 10px;
+}
+
+#wageArrows {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 5px;
+}
+
+.wage-arrow {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size:8px;
+    padding: 0;
+}
+
+.wage-arrow:hover {
+    color: #ccc;
+}
+
+.plus-btn {
+    font-size: 24px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    text-align: center;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.goal-section {
+    margin-top: 20px;
+}
+
+.goal {
+    background: #fff; /* Default background color for goals */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    transform: scale(1.0); /* Default scale for goals */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    position: relative; /* Position relative for the close button */
+}
+
+.goal.deselected {
+    background-color: #e9e9e9; /* Grey background for deselected goals */
+    transform: scale(0.95); /* Smaller size for deselected goals */
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #555; /* Dark grey */
+    transition: color 0.2s;
+}
+
+.close-button:hover {
+    color: #FF0000; /* Red on hover */
+}
+
+.progress-bar {
+    background: #007BFF;
+    height: 20px;
+    border-radius: 5px;
+    margin-top: 5px;
+}

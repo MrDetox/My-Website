@@ -1,0 +1,238 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hours Tracker</title>
+    <link rel="stylesheet" href="hours-styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hours Tracker</h1>
+        <div class="input-section">
+            <button id="currencyButton" class="blue-button" onclick="cycleCurrency()">GBP (£)</button>
+        </div>
+        <div class="input-section">
+            <div id="wageContainer" class="blue-button" onclick="toggleWageInput()">
+                <span id="currencySymbol">£</span>
+                <span id="wageValue" contenteditable="true" onkeydown="checkEnter(event)">15</span>
+                <div id="wageArrows" style="display:none;">
+                    <button class="wage-arrow" onclick="incrementWage(event, 1)">▲</button>
+                    <button class="wage-arrow" onclick="incrementWage(event, -1)">▼</button>
+                </div>
+            </div>
+            <button id="setWageBtn" class="blue-button" onclick="setWage()" style="display:none;">Save Wage</button>
+        </div>
+        <div class="input-section">
+            <label for="hoursWorked">Hours Worked:</label>
+            <input type="number" id="hoursWorked" step="0.1">
+            <button class="blue-button" onclick="addHours()">Add Hours</button>
+        </div>
+        <div class="input-section">
+            <button class="plus-btn" onclick="toggleGoalInput()">+</button>
+            <div id="goalInputFields" style="display:none;">
+                <label for="goalName">Goal Name:</label>
+                <input type="text" id="goalName">
+                <label for="goalCost">Cost:</label>
+                <input type="number" id="goalCost" step="0.01">
+                <button class="blue-button" onclick="addGoal()">Add Goal</button>
+            </div>
+        </div>
+        <div class="goal-section">
+            <h2>Goals</h2>
+            <div id="goalsList"></div>
+        </div>
+    </div>
+<script>
+    let hourlyWage = 15;
+let totalEarnings = 0;
+const goals = [];
+let currencySymbol = '£';
+const currencies = ['GBP (£)', 'USD ($)', 'EUR (€)', 'JPY (¥)'];
+let currentCurrencyIndex = 0;
+
+// Load state from localStorage
+function loadState() {
+    const savedWage = localStorage.getItem('hourlyWage');
+    if (savedWage) {
+        hourlyWage = parseInt(savedWage, 10);
+        document.getElementById('wageValue').textContent = hourlyWage;
+    }
+
+    const savedGoals = localStorage.getItem('goals');
+    if (savedGoals) {
+        const parsedGoals = JSON.parse(savedGoals);
+        parsedGoals.forEach(goal => goals.push(goal));
+    }
+
+    updateGoals();
+}
+
+// Save wage to localStorage
+function saveWage() {
+    localStorage.setItem('hourlyWage', hourlyWage);
+}
+
+// Save goals to localStorage
+function saveGoals() {
+    localStorage.setItem('goals', JSON.stringify(goals));
+}
+
+// Set wage function modified to save wage
+function setWage() {
+    const wageValueElement = document.getElementById('wageValue');
+    hourlyWage = parseInt(wageValueElement.textContent, 10);
+    if (!isNaN(hourlyWage) && hourlyWage > 0) {
+        document.getElementById('setWageBtn').style.display = 'none';
+        document.getElementById('wageArrows').style.display = 'none';
+        wageValueElement.contentEditable = 'false';
+                document.getElementById('wageContainer').style.width = '40px';
+        saveWage();
+    } else {
+        alert('Please enter a valid hourly wage.');
+    }
+}
+
+// Add goal function modified to save goals
+function addGoal() {
+    const goalName = document.getElementById('goalName').value;
+    const goalCost = parseFloat(document.getElementById('goalCost').value);
+
+    if (goalName && !isNaN(goalCost) && goalCost > 0) {
+        goals.push({ name: goalName, cost: goalCost, progress: 0, selected: true });
+        document.getElementById('goalName').value = '';
+        document.getElementById('goalCost').value = '';
+        toggleGoalInput();
+        updateGoals();
+        saveGoals();
+    } else {
+        alert('Please enter a valid goal name and cost.');
+    }
+}
+
+// Modified function to update goals and save state
+function updateGoals() {
+    const goalsList = document.getElementById('goalsList');
+    goalsList.innerHTML = '';
+
+    goals.forEach((goal, index) => {
+        const goalDiv = document.createElement('div');
+        goalDiv.className = 'goal';
+        goalDiv.classList.add(goal.selected ? 'selected' : 'deselected');
+
+        // Add close button
+        const closeButton = document.createElement('span');
+        closeButton.className = 'close-button';
+        closeButton.textContent = '×';
+        closeButton.onclick = (event) => {
+            event.stopPropagation();
+            removeGoal(index);
+        };
+        goalDiv.appendChild(closeButton);
+
+        goalDiv.onclick = () => toggleGoalSelection(goal.name);
+
+        const goalTitle = document.createElement('h3');
+        goalTitle.textContent = goal.name;
+        goalDiv.appendChild(goalTitle);
+
+        const progressText = document.createElement('p');
+        const progress = Math.min((goal.progress / goal.cost) * 100, 100);
+        const hoursRemaining = Math.max((goal.cost - goal.progress) / hourlyWage, 0);
+        progressText.textContent = `Progress: ${currencySymbol}${goal.progress.toFixed(2)} / ${currencySymbol}${goal.cost} (${progress.toFixed(2)}%) - Hours remaining: ${hoursRemaining.toFixed(2)}`;
+        goalDiv.appendChild(progressText);
+
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.style.width = `${progress}%`;
+        goalDiv.appendChild(progressBar);
+
+        goalsList.appendChild(goalDiv);
+    });
+
+    saveGoals();
+}
+
+// Function to remove a goal
+function removeGoal(index) {
+    goals.splice(index, 1);
+    updateGoals();
+}
+
+function toggleWageInput() {
+    const wageValueElement = document.getElementById('wageValue');
+    wageValueElement.contentEditable = 'true';
+    wageValueElement.focus();
+    document.getElementById('setWageBtn').style.display = 'inline-block';
+    document.getElementById('wageArrows').style.display = 'flex';
+            document.getElementById('wageContainer').style.width = '60px';
+}
+
+function incrementWage(event, amount) {
+    event.stopPropagation();
+    const wageValueElement = document.getElementById('wageValue');
+    let currentWage = parseInt(wageValueElement.textContent, 10);
+    if (!isNaN(currentWage)) {
+        currentWage += amount;
+        wageValueElement.textContent = currentWage;
+    }
+}
+
+function cycleCurrency() {
+    currentCurrencyIndex = (currentCurrencyIndex + 1) % currencies.length;
+    const newCurrency = currencies[currentCurrencyIndex];
+            currencySymbol = newCurrency.match(/\(([^)]+)\)/)[1];
+    document.getElementById('currencyButton').textContent = newCurrency;
+    document.getElementById('currencySymbol').textContent = currencySymbol;
+    updateGoals();
+}
+
+function addHours() {
+    const hoursWorked = parseFloat(document.getElementById('hoursWorked').value);
+    if (!isNaN(hoursWorked) && hoursWorked > 0 && hourlyWage > 0) {
+        const earnings = hoursWorked * hourlyWage;
+        allocateEarnings(earnings);
+        updateGoals();
+    } else {
+        alert('Please enter valid hours worked and make sure hourly wage is set.');
+    }
+}
+
+function toggleGoalInput() {
+    const goalInputFields = document.getElementById('goalInputFields');
+    goalInputFields.style.display = goalInputFields.style.display === 'none' ? 'block' : 'none';
+}
+
+function allocateEarnings(earnings) {
+    const selectedGoals = goals.filter(goal => goal.selected);
+    if (selectedGoals.length > 0) {
+        const earningsPerGoal = earnings / selectedGoals.length;
+        selectedGoals.forEach(goal => {
+            goal.progress += earningsPerGoal;
+        });
+    } else {
+        const earningsPerGoal = earnings / goals.length;
+        goals.forEach(goal => {
+            goal.progress += earningsPerGoal;
+        });
+    }
+}
+
+function toggleGoalSelection(goalName) {
+    const goal = goals.find(g => g.name === goalName);
+    if (goal) {
+        goal.selected = !goal.selected;
+    }
+    updateGoals();
+}
+
+function checkEnter(event) {
+    if (event.key === 'Enter') {
+        setWage();
+        event.preventDefault();
+    }
+}
+
+// Call loadState when the page loads
+window.onload = loadState;
+</script>
+</body>
+</html>
