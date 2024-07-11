@@ -7,232 +7,388 @@
 <body>
     <div class="container">
         <h1>Hours Tracker</h1>
-        <div class="input-section">
-            <button id="currencyButton" class="blue-button" onclick="cycleCurrency()">GBP (£)</button>
+        
+        <div class="top-section">
+            <div class="card" id="log-hours">
+            <div class="card-header">
+            <h2>Log Hours</h2>
+            </div>
+            <div class="input-section">
+                <label for="hoursWorked">Hours Worked:</label>
+                <input type="number" id="hoursWorked" step="0.1">
+                <button class="blue-button" onclick="addHours()">Add Hours</button>
+            </div>
         </div>
-        <div class="input-section">
-            <div id="wageContainer" class="blue-button" onclick="toggleWageInput()">
-                <span id="currencySymbol">£</span>
-                <span id="wageValue" contenteditable="true" onkeydown="checkEnter(event)">15</span>
-                <div id="wageArrows" style="display:none;">
-                    <button class="wage-arrow" onclick="incrementWage(event, 1)">▲</button>
-                    <button class="wage-arrow" onclick="incrementWage(event, -1)">▼</button>
+        
+            <div class="card" id="new-goal">
+            <h2>New Goal</h2>
+            <div class="input-section">
+                <button class="plus-btn" onclick="toggleGoalInput()">+</button>
+                <div id="goalInputFields" style="display:none;">
+                    <label for="goalName">Goal Name:</label>
+                    <input type="text" id="goalName">
+                    <label for="goalCost">Cost:</label>
+                    <input type="number" id="goalCost" step="0.01">
+                    <button class="blue-button" onclick="addGoal()">Add Goal</button>
                 </div>
             </div>
-            <button id="setWageBtn" class="blue-button" onclick="setWage()" style="display:none;">Save Wage</button>
         </div>
-        <div class="input-section">
-            <label for="hoursWorked">Hours Worked:</label>
-            <input type="number" id="hoursWorked" step="0.1">
-            <button class="blue-button" onclick="addHours()">Add Hours</button>
-        </div>
-        <div class="input-section">
-            <button class="plus-btn" onclick="toggleGoalInput()">+</button>
-            <div id="goalInputFields" style="display:none;">
-                <label for="goalName">Goal Name:</label>
-                <input type="text" id="goalName">
-                <label for="goalCost">Cost:</label>
-                <input type="number" id="goalCost" step="0.01">
-                <button class="blue-button" onclick="addGoal()">Add Goal</button>
+        
+            <div class="card" id="settings">
+                <h2>Settings</h2>
+                <label class="switch">
+                    <input type="checkbox" id="monthlyExpensesToggle" onchange="toggleMonthlyExpenses()">
+                    <span class="slider round"></span>
+                </label>
+                <div class="input-section">
+                    <button id="currencyButton" class="blue-button" onclick="cycleCurrency()">GBP (£)</button>
+                    
+                </div>
+                <div class="input-section">
+                    <div id="wageContainer" class="blue-button" onclick="toggleWageInput()">
+                        <span id="currencySymbol">£</span>
+                        <span id="wageValue" contenteditable="true" onkeydown="checkEnter(event)">15</span>
+                        <div id="wageArrows" style="display:none;">
+                            <button class="wage-arrow" onclick="incrementWage(event, 1)">▲</button>
+                            <button class="wage-arrow" onclick="incrementWage(event, -1)">▼</button>
+                        </div>
+                    </div>
+                    <button id="setWageBtn" class="blue-button" onclick="setWage()" style="display:none;">Save Wage</button>
+                    
+                </div>
             </div>
         </div>
-        <div class="goal-section">
-            <h2>Goals</h2>
+        
+        <div class="goals-section">
             <div id="goalsList"></div>
         </div>
     </div>
-<script>
-    let hourlyWage = 15;
-let totalEarnings = 0;
-const goals = [];
-let currencySymbol = '£';
-const currencies = ['GBP (£)', 'USD ($)', 'EUR (€)', 'JPY (¥)'];
-let currentCurrencyIndex = 0;
 
-// Load state from localStorage
-function loadState() {
-    const savedWage = localStorage.getItem('hourlyWage');
-    if (savedWage) {
-        hourlyWage = parseInt(savedWage, 10);
-        document.getElementById('wageValue').textContent = hourlyWage;
-    }
-
-    const savedGoals = localStorage.getItem('goals');
-    if (savedGoals) {
-        const parsedGoals = JSON.parse(savedGoals);
-        parsedGoals.forEach(goal => goals.push(goal));
-    }
-
-    updateGoals();
-}
-
-// Save wage to localStorage
-function saveWage() {
-    localStorage.setItem('hourlyWage', hourlyWage);
-}
-
-// Save goals to localStorage
-function saveGoals() {
-    localStorage.setItem('goals', JSON.stringify(goals));
-}
-
-// Set wage function modified to save wage
-function setWage() {
-    const wageValueElement = document.getElementById('wageValue');
-    hourlyWage = parseInt(wageValueElement.textContent, 10);
-    if (!isNaN(hourlyWage) && hourlyWage > 0) {
-        document.getElementById('setWageBtn').style.display = 'none';
-        document.getElementById('wageArrows').style.display = 'none';
-        wageValueElement.contentEditable = 'false';
+    <script>
+        let hourlyWage = 15;
+        let totalEarnings = 0;
+        const goals = [];
+        let currencySymbol = '£';
+        const currencies = ['GBP (£)', 'USD ($)', 'EUR (€)', 'JPY (¥)'];
+        let currentCurrencyIndex = 0;
+        let specialGoalHours = 0; // Separate variable for the special goal's hours
+    
+        // Load state from localStorage
+        function loadState() {
+            const savedWage = localStorage.getItem('hourlyWage');
+            if (savedWage) {
+                hourlyWage = parseInt(savedWage, 10);
+                document.getElementById('wageValue').textContent = hourlyWage;
+            }
+    
+            const savedGoals = localStorage.getItem('goals');
+            if (savedGoals) {
+                const parsedGoals = JSON.parse(savedGoals);
+                parsedGoals.forEach(goal => goals.push(goal));
+            }
+    
+            const savedSpecialGoalHours = localStorage.getItem('specialGoalHours');
+            if (savedSpecialGoalHours) {
+                specialGoalHours = parseInt(savedSpecialGoalHours, 10);
+            }
+    
+            const toggleState = localStorage.getItem('monthlyExpensesToggle');
+            if (toggleState) {
+                document.getElementById('monthlyExpensesToggle').checked = JSON.parse(toggleState);
+                toggleMonthlyExpenses(false); // false to prevent double saving on load
+            }
+    
+            updateGoals();
+        }
+    
+        // Save wage to localStorage
+        function saveWage() {
+            localStorage.setItem('hourlyWage', hourlyWage);
+        }
+    
+        // Save goals to localStorage
+        function saveGoals() {
+            localStorage.setItem('goals', JSON.stringify(goals));
+        }
+    
+        // Save toggle state to localStorage
+        function saveToggleState(state) {
+            localStorage.setItem('monthlyExpensesToggle', state);
+        }
+    
+        // Save special goal hours to localStorage
+        function saveSpecialGoalHours() {
+            localStorage.setItem('specialGoalHours', specialGoalHours);
+        }
+    
+        // Set wage function modified to save wage
+        function setWage() {
+            const wageValueElement = document.getElementById('wageValue');
+            hourlyWage = parseInt(wageValueElement.textContent, 10);
+            if (!isNaN(hourlyWage) && hourlyWage > 0) {
+                document.getElementById('setWageBtn').style.display = 'none';
+                document.getElementById('wageArrows').style.display = 'none';
+                wageValueElement.contentEditable = 'false';
                 document.getElementById('wageContainer').style.width = '40px';
-        saveWage();
-    } else {
-        alert('Please enter a valid hourly wage.');
-    }
+                saveWage();
+                updateGoals();
+            } else {
+                alert('Please enter a valid hourly wage.');
+            }
+        }
+    
+        // Add goal function modified to save goals
+        function addGoal() {
+            const goalName = document.getElementById('goalName').value;
+            const goalCost = parseFloat(document.getElementById('goalCost').value);
+    
+            if (goalName && !isNaN(goalCost) && goalCost > 0) {
+                goals.push({ name: goalName, cost: goalCost, progress: 0, selected: true });
+                document.getElementById('goalName').value = '';
+                document.getElementById('goalCost').value = '';
+                toggleGoalInput();
+                updateGoals();
+                saveGoals();
+            } else {
+                alert('Please enter a valid goal name and cost.');
+            }
+        }
+    
+        // Modified function to update goals and save state
+        function updateGoals() {
+            const goalsList = document.getElementById('goalsList');
+            goalsList.innerHTML = '';
+    
+            // Handle the special goal separately
+            const specialGoal = goals.find(goal => goal.name === 'Monthly Expenses');
+            if (specialGoal) {
+                const specialGoalDiv = createSpecialGoalDiv(specialGoal);
+                goalsList.appendChild(specialGoalDiv);
+            }
+    
+            // Handle other goals
+            goals.forEach((goal, index) => {
+                if (goal.name !== 'Monthly Expenses') {
+                    const goalDiv = createGoalDiv(goal, index);
+                    goalsList.appendChild(goalDiv);
+                }
+            });
+    
+            saveGoals();
+        }
+    
+        function createGoalDiv(goal, index) {
+    const goalDiv = document.createElement('div');
+    goalDiv.className = 'goal';
+    goalDiv.classList.add(goal.selected ? 'selected' : 'deselected');
+
+    // Add close button
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close-button';
+    closeButton.textContent = '×';
+    closeButton.onclick = (event) => {
+        event.stopPropagation();
+        removeGoal(index);
+    };
+    goalDiv.appendChild(closeButton);
+
+    goalDiv.onclick = () => toggleGoalSelection(goal.name);
+
+    const goalTitle = document.createElement('h3');
+    goalTitle.textContent = goal.name;
+    goalDiv.appendChild(goalTitle);
+
+    const progressText = document.createElement('p');
+    const progress = Math.min((goal.progress / goal.cost) * 100, 100);
+    const hoursRemaining = Math.max((goal.cost - goal.progress) / hourlyWage, 0);
+    progressText.innerHTML = `Progress: ${currencySymbol}${goal.progress.toFixed(2)} / ${currencySymbol}${goal.cost} (${progress.toFixed(2)}%)<br>Hours remaining: ${hoursRemaining.toFixed(2)}`;
+    goalDiv.appendChild(progressText);
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.style.width = `${progress}%`;
+    goalDiv.appendChild(progressBar);
+
+    return goalDiv;
 }
 
-// Add goal function modified to save goals
-function addGoal() {
-    const goalName = document.getElementById('goalName').value;
-    const goalCost = parseFloat(document.getElementById('goalCost').value);
+function createSpecialGoalDiv(goal) {
+    const specialGoalDiv = document.createElement('div');
+    specialGoalDiv.className = 'special-goal';
 
-    if (goalName && !isNaN(goalCost) && goalCost > 0) {
-        goals.push({ name: goalName, cost: goalCost, progress: 0, selected: true });
-        document.getElementById('goalName').value = '';
-        document.getElementById('goalCost').value = '';
-        toggleGoalInput();
-        updateGoals();
-        saveGoals();
-    } else {
-        alert('Please enter a valid goal name and cost.');
-    }
+    const goalTitle = document.createElement('h3');
+    goalTitle.textContent = goal.name;
+    specialGoalDiv.appendChild(goalTitle);
+
+    const hoursControls = document.createElement('div');
+    hoursControls.className = 'hours-controls';
+
+    const hoursText = document.createElement('span');
+    hoursText.textContent = `Hours: ${specialGoalHours}`;
+    hoursControls.appendChild(hoursText);
+
+    const increaseButton = document.createElement('button');
+    increaseButton.textContent = '+';
+    increaseButton.onclick = (event) => {
+        event.stopPropagation();
+        adjustSpecialGoalHours(1);
+    };
+    hoursControls.appendChild(increaseButton);
+
+    const decreaseButton = document.createElement('button');
+    decreaseButton.textContent = '-';
+    decreaseButton.onclick = (event) => {
+        event.stopPropagation();
+        adjustSpecialGoalHours(-1);
+    };
+    hoursControls.appendChild(decreaseButton);
+
+    specialGoalDiv.appendChild(hoursControls);
+
+    const goalCost = specialGoalHours * hourlyWage;
+    goal.cost = goalCost; // Update the special goal's cost
+    const progressText = document.createElement('p');
+    const progress = Math.min((goal.progress / goalCost) * 100, 100);
+    const hoursRemaining = Math.max((goalCost - goal.progress) / hourlyWage, 0);
+    progressText.innerHTML = `Progress: ${currencySymbol}${goal.progress.toFixed(2)} / ${currencySymbol}${goalCost.toFixed(2)} (${progress.toFixed(2)}%)<br>Hours remaining: ${hoursRemaining.toFixed(2)}`;
+    specialGoalDiv.appendChild(progressText);
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.style.width = `${progress}%`;
+    specialGoalDiv.appendChild(progressBar);
+
+    return specialGoalDiv;
 }
 
-// Modified function to update goals and save state
-function updateGoals() {
-    const goalsList = document.getElementById('goalsList');
-    goalsList.innerHTML = '';
-
-    goals.forEach((goal, index) => {
-        const goalDiv = document.createElement('div');
-        goalDiv.className = 'goal';
-        goalDiv.classList.add(goal.selected ? 'selected' : 'deselected');
-
-        // Add close button
-        const closeButton = document.createElement('span');
-        closeButton.className = 'close-button';
-        closeButton.textContent = '×';
-        closeButton.onclick = (event) => {
-            event.stopPropagation();
-            removeGoal(index);
-        };
-        goalDiv.appendChild(closeButton);
-
-        goalDiv.onclick = () => toggleGoalSelection(goal.name);
-
-        const goalTitle = document.createElement('h3');
-        goalTitle.textContent = goal.name;
-        goalDiv.appendChild(goalTitle);
-
-        const progressText = document.createElement('p');
-        const progress = Math.min((goal.progress / goal.cost) * 100, 100);
-        const hoursRemaining = Math.max((goal.cost - goal.progress) / hourlyWage, 0);
-        progressText.textContent = `Progress: ${currencySymbol}${goal.progress.toFixed(2)} / ${currencySymbol}${goal.cost} (${progress.toFixed(2)}%) - Hours remaining: ${hoursRemaining.toFixed(2)}`;
-        goalDiv.appendChild(progressText);
-
-        const progressBar = document.createElement('div');
-        progressBar.className = 'progress-bar';
-        progressBar.style.width = `${progress}%`;
-        goalDiv.appendChild(progressBar);
-
-        goalsList.appendChild(goalDiv);
-    });
-
-    saveGoals();
-}
-
-// Function to remove a goal
-function removeGoal(index) {
-    goals.splice(index, 1);
-    updateGoals();
-}
-
-function toggleWageInput() {
-    const wageValueElement = document.getElementById('wageValue');
-    wageValueElement.contentEditable = 'true';
-    wageValueElement.focus();
-    document.getElementById('setWageBtn').style.display = 'inline-block';
-    document.getElementById('wageArrows').style.display = 'flex';
+function adjustSpecialGoalHours(amount) {
+            specialGoalHours = Math.max(0, specialGoalHours + amount);
+            saveSpecialGoalHours();
+            updateGoals();
+        }
+    
+        // Function to remove a goal
+        function removeGoal(index) {
+            goals.splice(index, 1);
+            updateGoals();
+        }
+    
+        function toggleWageInput() {
+            const wageValueElement = document.getElementById('wageValue');
+            wageValueElement.contentEditable = 'true';
+            wageValueElement.focus();
+            document.getElementById('setWageBtn').style.display = 'inline-block';
+            document.getElementById('wageArrows').style.display = 'flex';
             document.getElementById('wageContainer').style.width = '60px';
-}
-
-function incrementWage(event, amount) {
-    event.stopPropagation();
-    const wageValueElement = document.getElementById('wageValue');
-    let currentWage = parseInt(wageValueElement.textContent, 10);
-    if (!isNaN(currentWage)) {
-        currentWage += amount;
-        wageValueElement.textContent = currentWage;
-    }
-}
-
-function cycleCurrency() {
-    currentCurrencyIndex = (currentCurrencyIndex + 1) % currencies.length;
-    const newCurrency = currencies[currentCurrencyIndex];
+        }
+    
+        function incrementWage(event, amount) {
+            event.stopPropagation();
+            const wageValueElement = document.getElementById('wageValue');
+            let currentWage = parseInt(wageValueElement.textContent, 10);
+            if (!isNaN(currentWage)) {
+                currentWage += amount;
+                wageValueElement.textContent = currentWage;
+            }
+        }
+    
+        function cycleCurrency() {
+            currentCurrencyIndex = (currentCurrencyIndex + 1) % currencies.length;
+            const newCurrency = currencies[currentCurrencyIndex];
             currencySymbol = newCurrency.match(/\(([^)]+)\)/)[1];
-    document.getElementById('currencyButton').textContent = newCurrency;
-    document.getElementById('currencySymbol').textContent = currencySymbol;
-    updateGoals();
-}
+            document.getElementById('currencyButton').textContent = newCurrency;
+            document.getElementById('currencySymbol').textContent = currencySymbol;
+            updateGoals();
+        }
+    
+        function addHours() {
+            const hoursWorked = parseFloat(document.getElementById('hoursWorked').value);
+            if (!isNaN(hoursWorked) && hoursWorked > 0 && hourlyWage > 0) {
+                const earnings = hoursWorked * hourlyWage;
+                allocateEarnings(earnings);
+                updateGoals();
+            } else {
+                alert('Please enter valid hours worked and make sure hourly wage is set.');
+            }
+        }
+    
+        function toggleGoalInput() {
+            const goalInputFields = document.getElementById('goalInputFields');
+            goalInputFields.style.display = goalInputFields.style.display === 'none' ? 'block' : 'none';
+        }
+    
+        function allocateEarnings(earnings) {
+        let remainingEarnings = earnings;
+        let eligibleGoals = goals.filter(goal => goal.selected && goal.progress < goal.cost);
 
-function addHours() {
-    const hoursWorked = parseFloat(document.getElementById('hoursWorked').value);
-    if (!isNaN(hoursWorked) && hoursWorked > 0 && hourlyWage > 0) {
-        const earnings = hoursWorked * hourlyWage;
-        allocateEarnings(earnings);
-        updateGoals();
-    } else {
-        alert('Please enter valid hours worked and make sure hourly wage is set.');
-    }
-}
+        while (remainingEarnings > 0 && eligibleGoals.length > 0) {
+            const earningsPerGoal = remainingEarnings / eligibleGoals.length;
+        eligibleGoals.forEach(goal => {
+            const remainingAmount = goal.cost - goal.progress;
+            if (remainingAmount < earningsPerGoal) {
+                goal.progress += remainingAmount;
+                    remainingEarnings -= remainingAmount;
+            } else {
+                    goal.progress += earningsPerGoal;
+                    remainingEarnings -= earningsPerGoal;
+            }
+                });
 
-function toggleGoalInput() {
-    const goalInputFields = document.getElementById('goalInputFields');
-    goalInputFields.style.display = goalInputFields.style.display === 'none' ? 'block' : 'none';
-}
+            eligibleGoals = goals.filter(goal => goal.selected && goal.progress < goal.cost);
+            }
+        }
+    
+        function toggleGoalSelection(goalName) {
+            const goal = goals.find(g => g.name === goalName);
+            if (goal) {
+                goal.selected = !goal.selected;
+            }
+            updateGoals();
+        }
+    
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                setWage();
+                event.preventDefault();
+            }
+        }
+    
+        // Function to create or remove the special goal
+        function toggleMonthlyExpenses(saveState = true) {
+            const monthlyExpensesGoalIndex = goals.findIndex(goal => goal.name === 'Monthly Expenses');
+            const toggleState = document.getElementById('monthlyExpensesToggle').checked;
+    
+            if (toggleState && monthlyExpensesGoalIndex === -1) {
+            goals.push({ name: 'Monthly Expenses', cost: specialGoalHours * hourlyWage, progress: 0, selected: true });
+                updateGoals();
+            } else if (!toggleState && monthlyExpensesGoalIndex !== -1) {
+                goals.splice(monthlyExpensesGoalIndex, 1);
+                updateGoals();
+            }
+    
+            if (saveState) {
+                saveToggleState(toggleState);
+            }
+            saveGoals();
+        }
+    
 
-function allocateEarnings(earnings) {
-    const selectedGoals = goals.filter(goal => goal.selected);
-    if (selectedGoals.length > 0) {
-        const earningsPerGoal = earnings / selectedGoals.length;
-        selectedGoals.forEach(goal => {
-            goal.progress += earningsPerGoal;
-        });
-    } else {
-        const earningsPerGoal = earnings / goals.length;
-        goals.forEach(goal => {
-            goal.progress += earningsPerGoal;
-        });
-    }
-}
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
 
-function toggleGoalSelection(goalName) {
-    const goal = goals.find(g => g.name === goalName);
-    if (goal) {
-        goal.selected = !goal.selected;
-    }
-    updateGoals();
-}
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('settingsModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
 
-function checkEnter(event) {
-    if (event.key === 'Enter') {
-        setWage();
-        event.preventDefault();
-    }
-}
+        // Call loadState when the page loads
+        window.onload = loadState;
 
-// Call loadState when the page loads
-window.onload = loadState;
-</script>
+    </script>
 </body>
 </html>
